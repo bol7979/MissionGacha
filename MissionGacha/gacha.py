@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-# gacha.py — Mission Gacha (roulette-only spinner)
+# gacha.py — Mission Gacha (roulette-only) + stats mode
 # - Difficulty lock toggle (config.json)
-# - rewards.json: user-managed, missing IDs auto-filled (UUID)
-# - Single-line safe spinner (no blank lines), easing + overshoot + palette
-# - validate mode to sanity-check rewards
+# - rewards.json: user-managed; missing IDs auto-filled (UUID)
+# - history.json now stores reward_name and reward_grade
+# - Spinner: single-line roulette with easing/overshoot/confetti
+# - --validate, --stats[=days] added
 
 import json, os, sys, time, random, uuid, shutil
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import Counter, defaultdict
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH  = os.path.join(ROOT, "config.json")
@@ -37,12 +39,12 @@ def ensure_files():
             },
             "spinner": {
                 "cycles": 3,
-                "duration_ms": 0,     # 0이면 cycles 기반
+                "duration_ms": 0,   # 0이면 cycles 기반
                 "fps": 30,
                 "ease_out": True,
                 "overshoot": True,
                 "window": 5,
-                "palette": "neon",   # classic | neon | sunset | mono
+                "palette": "neon",  # classic | neon | sunset | mono
                 "final_blink": 4,
                 "confetti": True,
                 "beep": False,
@@ -97,7 +99,6 @@ class Spinner:
         "sunset":  {"focus":"yellow", "trail1":"magenta","trail2":"red"},
         "mono":    {"focus":"white",  "trail1":"white", "trail2":"white"},
     }
-
     def __init__(self, cfg):
         sp = cfg.get("spinner", {})
         self.cycles      = int(sp.get("cycles", 3))
@@ -146,9 +147,7 @@ class Spinner:
         return "  ".join(painted)
 
     def _run_roulette(self, names, final_index):
-        ring = list(names)
-        n = len(ring)
-        # steps: cycles 기반 또는 duration 기반
+        ring = list(names); n = len(ring)
         if self.duration_ms > 0:
             steps = max(10, int(self.fps * (self.duration_ms/1000.0)))
             base_rot = (steps // n) * n
@@ -156,17 +155,14 @@ class Spinner:
         else:
             steps = self.cycles * n + (final_index % n)
 
-        overshoot_steps = 0
-        backtrack = []
+        overshoot_steps = 0; backtrack = []
         if self.overshoot:
             overshoot_steps = min(n//3 + 1, 5)
             backtrack = list(range(overshoot_steps, 0, -1))
 
         delays = self._delays(steps + overshoot_steps + len(backtrack))
-        w = term_width()
-        half = max(1, self.window // 2)
+        w = term_width(); half = max(1, self.window // 2)
 
-        pos = 0
         for i in range(steps + overshoot_steps):
             pos = i % n
             seq = [ring[(pos - half + k) % n] for k in range(self.window)]
@@ -221,8 +217,7 @@ def load_rewards_with_uuid_backfill():
     return rewards
 
 def validate_rewards(rewards):
-    ok = True
-    ids = set()
+    ok = True; ids = set()
     for i, r in enumerate(rewards):
         rid = r.get("id")
         if rid in ids:
@@ -250,29 +245,85 @@ def pick_reward(pool):
     weights = [max(1e-6, float(r.get("weight", 1.0))) for r in pool]
     return random.choices(pool, weights=weights, k=1)[0]
 
-def record_history(difficulty, reward_id, reward_name):
+def record_history(difficulty, reward_id, reward_name, reward_grade):
     hist = load_json(HISTORY_PATH, [])
     hist.append({
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "difficulty": difficulty,
         "reward_id": reward_id,
-        "reward_name": reward_name
+        "reward_name": reward_name,
+        "reward_grade": reward_grade
     })
     save_json(HISTORY_PATH, hist)
 
+# -------------------- Stats --------------------
+def parse_iso(ts):
+    try:
+        return datetime.fromisoformat(ts)
+    except Exception:
+        return None
+
+def show_stats(days=None):
+    rewards = load_json(REWARDS_PATH, [])
+    hist = load_json(HISTORY_PATH, [])
+    if not hist:
+        print(ansi("[stats] no history yet.", fg="yellow")); return
+
+    # 기간 필터
+    if days:
+        cutoff = datetime.now() - timedelta(days=days)
+        hist = [h for h in hist if parse_iso(h.get("timestamp","")) and parse_iso(h["timestamp"]) >= cutoff]
+
+    total = len(hist)
+    # 난이도 분포
+    by_diff = Counter(h.get("difficulty","UNKNOWN") for h in hist)
+    # 등급 분포 (새 기록은 reward_grade 사용, 과거 기록은 UNKNOWN)
+    by_grade = Counter(h.get("reward_grade","UNKNOWN") for h in hist)
+    # 보상 Top-5
+    by_name = Counter(h.get("reward_name","?") for h in hist).most_common(5)
+
+    def pct(n): return f"{(100*n/total):5.1f}%"
+
+    print(ansi(f"[stats] samples: {total}{' (last '+str(days)+'d)' if days else ''}", fg="cyan", style="bold"))
+
+    print(ansi("\nDifficulty distribution:", style="bold"))
+    for k in DIFF_ORDER + [d for d in by_diff if d not in DIFF_ORDER]:
+        if by_diff.get(k): print(f"  {k:<6} : {by_diff[k]:>4}  ({pct(by_diff[k])})")
+
+    print(ansi("\nGrade distribution:", style="bold"))
+    for k in ("BASIC","RARE","EPIC","UNKNOWN"):
+        if by_grade.get(k): print(f"  {k:<6} : {by_grade[k]:>4}  ({pct(by_grade[k])})")
+
+    print(ansi("\nTop rewards:", style="bold"))
+    for name, cnt in by_name:
+        print(f"  {ellipsis(name, 40):<40} : {cnt:>4}  ({pct(cnt)})")
+
 # -------------------- Main --------------------
 def main():
+    # stats / validate quick paths
+    if any(arg.startswith("--stats") for arg in sys.argv):
+        ensure_files()
+        # optional: --stats=30
+        days = None
+        for arg in sys.argv:
+            if arg.startswith("--stats="):
+                try: days = int(arg.split("=",1)[1])
+                except: days = None
+        show_stats(days)
+        return
+
     if "--validate" in sys.argv:
         ensure_files()
         rewards = load_rewards_with_uuid_backfill()
         validate_rewards(rewards)
         return
 
+    # normal gacha
     ensure_files()
     cfg = load_config()
     rewards = load_rewards_with_uuid_backfill()
 
-    if len(sys.argv) >= 2 and sys.argv[1] not in ("--validate",):
+    if len(sys.argv) >= 2 and sys.argv[1] not in ("--validate",) and not sys.argv[1].startswith("--stats"):
         mission_diff = sys.argv[1].upper()
     else:
         mission_diff = input("Mission difficulty (EASY/MEDIUM/HARD): ").strip().upper()
@@ -295,7 +346,7 @@ def main():
     sp.run(names, final_index)
 
     print(ansi(f"★ Reward: {chosen['name']}  (grade={chosen.get('grade')})", fg="green", style="bold"))
-    record_history(mission_diff, chosen["id"], chosen["name"])
+    record_history(mission_diff, chosen["id"], chosen["name"], chosen.get("grade","UNKNOWN"))
 
 if __name__ == "__main__":
     try:

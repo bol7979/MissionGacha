@@ -1,20 +1,9 @@
 [
   {
-    "timestamp": "2025-08-13T05:32:45",
+    "timestamp": "2025-08-13T05:49:13",
     "difficulty": "EASY",
-    "reward_id": "007f7a1a-570e-4f4d-847d-5a44f9a82143",
-    "reward_name": "Game (30m)"
-  },
-  {
-    "timestamp": "2025-08-13T05:33:11",
-    "difficulty": "MEDIUM",
-    "reward_id": "f4b5d8c9-2869-4e60-95e7-02a332c86642",
-    "reward_name": "Music Break"
-  },
-  {
-    "timestamp": "2025-08-13T05:33:17",
-    "difficulty": "MEDIUM",
-    "reward_id": "10ed6278-0c65-4e76-b940-f523f7ff8e4a",
-    "reward_name": "Movie Episode"
+    "reward_id": "166f62dc-dbae-4593-b9f1-f6c0c7557e13",
+    "reward_name": "Music Break",
+    "reward_grade": "BASIC"
   }
 ]

@@ -4,41 +4,41 @@
     "grade": "BASIC",
     "weight": 3,
     "enabled": true,
-    "id": "c1032160-9338-462b-ba82-b6bb883dca4d"
+    "id": "6c5f7506-7e25-4ba7-b99a-6dcd54da80cc"
   },
   {
     "name": "Game (30m)",
     "grade": "BASIC",
     "weight": 2,
     "enabled": true,
-    "id": "007f7a1a-570e-4f4d-847d-5a44f9a82143"
+    "id": "1a58330e-1f59-4a78-a55a-df37f071c22a"
   },
   {
     "name": "Music Break",
     "grade": "BASIC",
     "weight": 3,
     "enabled": true,
-    "id": "f4b5d8c9-2869-4e60-95e7-02a332c86642"
+    "id": "166f62dc-dbae-4593-b9f1-f6c0c7557e13"
   },
   {
     "name": "Cafe Drink",
     "grade": "RARE",
     "weight": 1,
     "enabled": true,
-    "id": "fdeec1d2-68a0-4dcb-84c2-43d72f82f502"
+    "id": "b84459fd-67c0-40d6-9e12-258c5b835e55"
   },
   {
     "name": "Movie Episode",
     "grade": "RARE",
     "weight": 1,
     "enabled": true,
-    "id": "10ed6278-0c65-4e76-b940-f523f7ff8e4a"
+    "id": "2cccc603-2132-4223-b6e4-084c07636cb9"
   },
   {
     "name": "Delivery Meal",
     "grade": "EPIC",
     "weight": 1,
     "enabled": true,
-    "id": "cf874886-453b-4f61-b886-12dd00cbf949"
+    "id": "55a2982e-03a0-4eca-bc36-1e85e182c89f"
   }
 ]
