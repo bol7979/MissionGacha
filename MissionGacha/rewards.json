@@ -1,8 +1,44 @@
 [
-  { "id": "uuid-1", "name": "Short Video (5m)", "grade": "BASIC", "weight": 3, "enabled": true },
-  { "id": "uuid-2", "name": "Game (30m)",       "grade": "BASIC", "weight": 2, "enabled": true },
-  { "id": "uuid-3", "name": "Music Break",      "grade": "BASIC", "weight": 3, "enabled": true },
-  { "id": "uuid-4", "name": "Cafe Drink",       "grade": "RARE",  "weight": 1, "enabled": true },
-  { "id": "uuid-5", "name": "Movie Episode",    "grade": "RARE",  "weight": 1, "enabled": true },
-  { "id": "uuid-6", "name": "Delivery Meal",    "grade": "EPIC",  "weight": 1, "enabled": true }
+  {
+    "name": "Short Video (5m)",
+    "grade": "BASIC",
+    "weight": 3,
+    "enabled": true,
+    "id": "c1032160-9338-462b-ba82-b6bb883dca4d"
+  },
+  {
+    "name": "Game (30m)",
+    "grade": "BASIC",
+    "weight": 2,
+    "enabled": true,
+    "id": "007f7a1a-570e-4f4d-847d-5a44f9a82143"
+  },
+  {
+    "name": "Music Break",
+    "grade": "BASIC",
+    "weight": 3,
+    "enabled": true,
+    "id": "f4b5d8c9-2869-4e60-95e7-02a332c86642"
+  },
+  {
+    "name": "Cafe Drink",
+    "grade": "RARE",
+    "weight": 1,
+    "enabled": true,
+    "id": "fdeec1d2-68a0-4dcb-84c2-43d72f82f502"
+  },
+  {
+    "name": "Movie Episode",
+    "grade": "RARE",
+    "weight": 1,
+    "enabled": true,
+    "id": "10ed6278-0c65-4e76-b940-f523f7ff8e4a"
+  },
+  {
+    "name": "Delivery Meal",
+    "grade": "EPIC",
+    "weight": 1,
+    "enabled": true,
+    "id": "cf874886-453b-4f61-b886-12dd00cbf949"
+  }
 ]

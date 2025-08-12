@@ -1,9 +1,30 @@
 {
-  "use_difficulty_lock": false,
+  "use_difficulty_lock": true,
   "grade_unlock_map": {
-    "EASY":   ["BASIC"],
-    "MEDIUM": ["BASIC", "RARE"],
-    "HARD":   ["BASIC", "RARE", "EPIC"]
+    "EASY": [
+      "BASIC"
+    ],
+    "MEDIUM": [
+      "BASIC",
+      "RARE"
+    ],
+    "HARD": [
+      "BASIC",
+      "RARE",
+      "EPIC"
+    ]
   },
-  "spinner": { "cycles": 3, "fps": 24, "ease_out": true }
+  "spinner": {
+    "cycles": 3,
+    "duration_ms": 0,
+    "fps": 30,
+    "ease_out": true,
+    "overshoot": true,
+    "window": 5,
+    "palette": "neon",
+    "final_blink": 4,
+    "confetti": true,
+    "beep": false,
+    "seed": null
+  }
 }
