@@ -1,0 +1,9 @@
+{
+  "use_difficulty_lock": false,
+  "grade_unlock_map": {
+    "EASY":   ["BASIC"],
+    "MEDIUM": ["BASIC", "RARE"],
+    "HARD":   ["BASIC", "RARE", "EPIC"]
+  },
+  "spinner": { "cycles": 3, "fps": 24, "ease_out": true }
+}
