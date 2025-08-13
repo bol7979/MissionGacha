@@ -76,7 +76,7 @@ MissionGacha(미션가챠)는 행동주의 심리학 이론인 [조작적 조건
 - `enabled`: `false`시 비활성화
 
 
-🔍보상 목록(`rewards.json`) 작성 예시
+🔍 보상 목록(`rewards.json`) 작성 예시
 ---
 ```json
 [
